@@ -11,11 +11,11 @@ create table Produto(
 # === Semi-Livres ===
 create table Funcionario(
 	id_fun int primary key auto_increment,
-	nome_usu varchar(300) not null,
-    cpf_usu varchar(50) not null,
-    email_usu varchar(100) not null,
-    rg_usu varchar(20) not null,
-    data_nasc_usu date not null,
+	nome_fun varchar(300) not null,
+    cpf_fun varchar(50) not null,
+    email_fun varchar(100) not null,
+    rg_fun varchar(20) not null,
+    data_nasc_fun date not null,
     salario_fun float not null
 );
 
@@ -114,8 +114,37 @@ $$ delimiter ;
 
 call cadastroProduto("", 590);
 
+# == Cadastrar Funcionário ==
+
+select * from funcionario;
+
+delimiter $$ 
+create procedure cadastroFuncionario(nome_fun varchar(300), cpf_fun varchar(100), email_fun varchar(100), rg_fun varchar(100), data_nasc_fun date, salario_fun float)
+begin
+	if(nome_fun is not null) then
+		if(cpf_fun is not null) then
+			if(email_fun is not null) then
+				if(rg_fun is not null) then
+					if(data_nasc_fun is not null) then
+						if(salario_fun is not null) then
+							insert into funcionario values (null, nome_fun, cpf_fun, email_fun, rg_fun, data_nasc_fun, salario_fun);						
+						else select "Salário inválido" as confirmacao;
+                        end if;
+					else select "Data de nascimento inválida" as confirmacao;
+                    end if;
+				else select "RG inválido" as confirmacao;
+                end if;
+			else select "Email inválido" as confirmacao;
+            end if;
+		else select "CPF inválido" as confirmacao;
+        end if;
+	else select "Nome inválido" as confirmacao;
+    end if;
+end;
+$$ delimiter ;
+
+
 select * from produto;
-=======
 delimiter $$ 
 create procedure consultarProduto(produto varchar(300))
 begin
