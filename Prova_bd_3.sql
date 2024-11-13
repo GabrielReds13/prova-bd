@@ -91,8 +91,6 @@ create table UseVen(
 );
 
 # === Metodos ===
-<<<<<<< HEAD
-
 
 # == Cadastrar Produto ==
 delimiter $$ 
@@ -137,5 +135,3 @@ begin
     end if;
 end;
 $$ delimiter ;
-
->>>>>>> bf4749ebd08ea41b94b67067d757d74ee6986a5e
