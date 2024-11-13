@@ -11,11 +11,11 @@ create table Produto(
 # === Semi-Livres ===
 create table Funcionario(
 	id_fun int primary key auto_increment,
-	nome_usu varchar(300) not null,
-    cpf_usu varchar(50) not null,
-    email_usu varchar(100) not null,
-    rg_usu varchar(20) not null,
-    data_nasc_usu date not null,
+	nome_fun varchar(300) not null,
+    cpf_fun varchar(50) not null,
+    email_fun varchar(100) not null,
+    rg_fun varchar(20) not null,
+    data_nasc_fun date not null,
     salario_fun float not null
 );
 
@@ -131,7 +131,39 @@ begin
         from Produto
         inner join Estoque on (id_pro_fk = findProduto);
 	else
-		select "Item não encontrado" as Mensagem;
+		select "Item não encontrado" as Mensagem; 
+    end if;
+end;
+$$ delimiter ;
+
+delimiter $$ 
+create procedure consultarCliente(nome varchar(300))
+begin
+	declare findCliente int;
+    set findCliente = (select id_cli from cliente where (nome_cli = nome));
+    
+    if(findCliente) then
+		select
+        nome_cli as Nome
+        from Cliente;
+    else
+		select "Cliente não encontrado" as Mensagem; 
+    end if;
+end;
+$$ delimiter ;
+
+delimiter $$ 
+create procedure consultarFuncionario(nome varchar(300))
+begin
+	declare findFuncionario int;
+    set findFuncionario = (select id_fun from Funcionario where (nome_fun = nome));
+    
+    if(findFuncionario) then
+		select
+        nome_fun as Nome
+        from Funcionario;
+    else
+		select "Funcionário não encontrado" as Mensagem; 
     end if;
 end;
 $$ delimiter ;
