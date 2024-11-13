@@ -91,6 +91,7 @@ create table UseVen(
 );
 
 # === Metodos ===
+<<<<<<< HEAD
 
 
 # == Cadastrar Produto ==
@@ -116,3 +117,25 @@ $$ delimiter ;
 call cadastroProduto("", 590);
 
 select * from produto;
+=======
+delimiter $$ 
+create procedure consultarProduto(produto varchar(300))
+begin
+	declare findProduto int;
+	set findProduto = (select id_pro from Produto where(descricao_pro = produto));
+    
+    if(findProduto) then
+		select 
+		Produto.descricao_pro as Produto, 
+        Estoque.unidade_est as Unidade,
+        Estoque.quantidade_est as Quantiade,
+		Produto.valor_pro as Valor 
+        from Produto
+        inner join Estoque on (id_pro_fk = findProduto);
+	else
+		select "Item não encontrado" as Mensagem;
+    end if;
+end;
+$$ delimiter ;
+
+>>>>>>> bf4749ebd08ea41b94b67067d757d74ee6986a5e
