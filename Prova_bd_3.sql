@@ -115,7 +115,7 @@ $$ delimiter ;
 call cadastroProduto("", 590);
 
 select * from produto;
-=======
+# == ConsultarProduto ==
 delimiter $$ 
 create procedure consultarProduto(produto varchar(300))
 begin
@@ -135,3 +135,37 @@ begin
     end if;
 end;
 $$ delimiter ;
+
+# == Cadastrar Cliente ==
+delimiter $$ 
+create procedure cadastroCliente(nomeCli varchar(300), cpfCli varchar(30), emailCli varchar(100), rgCli varchar(30), dataNasCli date)
+begin
+	if(nomeCli is not null) then
+		if(cpfCli is not null) then
+			if(emailCli is not null) then
+				if(rgCli is not null) then
+					if(dataNasCli is not null) then
+						insert into Cliente values (null, nomeCli, cpfCli, emailCli, rgCli, dataNasCli);
+					else 
+						select "A Data de Nascimento informada é inválida!" as confimacao;
+					end if;
+				else
+					select "O RG informado é inválido!" as confimacao;
+				end if;	
+			else 
+				select "O Email informado é inválido!" as confimacao;
+            end if;
+		else
+			select "O CPF informado é inválido!" as confimacao;
+        end if;	
+	else 
+		select "O Nome informado é inválido!" as confirmacao;
+    end if;
+end;
+$$ delimiter ;
+
+call cadastroCliente("Kauan Marques", "123.456.789-00", "kauanmarques@gmail.com", "1234567", "2006-08-23");
+call cadastroCliente("Miguel Henrique", "098.765.432-1", "miguelito@gmail.com", "7654321", "2007-04-20");
+call cadastroCliente("Gabrieel Guedes", "135.791.357-99", "reds13@gmail.com", "1110202", "2006-07-18");
+select * from cliente;
+
