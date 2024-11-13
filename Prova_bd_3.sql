@@ -122,16 +122,22 @@ begin
 	declare findProduto int;
 	set findProduto = (select id_pro from Produto where(descricao_pro = produto));
     
-    if(findProduto) then
-		select 
-		Produto.descricao_pro as Produto, 
-        Estoque.unidade_est as Unidade,
-        Estoque.quantidade_est as Quantiade,
-		Produto.valor_pro as Valor 
-        from Produto
-        inner join Estoque on (id_pro_fk = findProduto);
+    if(produto is not null) then
+		set findProduto = (select id_pro from Produto where(descricao_pro = produto));
+    
+		if(findProduto) then
+			select 
+			Produto.descricao_pro as Produto, 
+			Estoque.unidade_est as Unidade,
+			Estoque.quantidade_est as Quantiade,
+			Produto.valor_pro as Valor 
+			from Produto
+			inner join Estoque on (id_pro_fk = findProduto);
+		else
+			select "Item não encontrado" as Mensagem; 
+		end if;
 	else
-		select "Item não encontrado" as Mensagem; 
+		select "Texto inválido." as Mensagem; 
     end if;
 end;
 $$ delimiter ;
@@ -142,12 +148,18 @@ begin
 	declare findCliente int;
     set findCliente = (select id_cli from cliente where (nome_cli = nome));
     
-    if(findCliente) then
-		select
-        nome_cli as Nome
-        from Cliente;
+    if(nome is not null) then
+		set findCliente = (select id_cli from cliente where (nome_cli = nome));
+    
+		if(findCliente) then
+			select
+			nome_cli as Nome
+			from Cliente;
+		else
+			select "Cliente não encontrado" as Mensagem; 
+		end if;
     else
-		select "Cliente não encontrado" as Mensagem; 
+		select "Texto inválido." as Mensagem; 
     end if;
 end;
 $$ delimiter ;
@@ -156,14 +168,18 @@ delimiter $$
 create procedure consultarFuncionario(nome varchar(300))
 begin
 	declare findFuncionario int;
-    set findFuncionario = (select id_fun from Funcionario where (nome_fun = nome));
+	if(nome is not null) then
+		set findFuncionario = (select id_fun from Funcionario where (nome_fun = nome));
     
-    if(findFuncionario) then
-		select
-        nome_fun as Nome
-        from Funcionario;
+		if(findFuncionario) then
+			select
+			nome_fun as Nome
+			from Funcionario;
+		else
+			select "Funcionário não encontrado" as Mensagem; 
+		end if;
     else
-		select "Funcionário não encontrado" as Mensagem; 
+		select "Texto inválido." as Mensagem; 
     end if;
 end;
 $$ delimiter ;
