@@ -201,3 +201,5 @@ call cadastroCliente("Miguel Henrique", "098.765.432-1", "miguelito@gmail.com", 
 call cadastroCliente("Gabrieel Guedes", "135.791.357-99", "reds13@gmail.com", "1110202", "2006-07-18");
 select * from cliente;
 
+# == 
+
