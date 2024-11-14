@@ -1,3 +1,12 @@
+/* 
+Alunos:
+
+Gabriel Guedes
+Kauan Marques
+Miguel Henrique
+
+*/
+
 create database Prova_BD_3;
 use Prova_BD_3;
 
@@ -113,6 +122,10 @@ begin
 end;
 $$ delimiter ;
 
+call cadastrarProduto("Camiseta Spiderverse", 50.00);
+call cadastrarProduto("Moletom Spiderverse", 70.00);
+call cadastrarProduto("Jaqueta Spiderverse", 100.00);
+
 delimiter $$ 
 create procedure consultarProduto(produto varchar(300))
 begin
@@ -167,6 +180,10 @@ begin
     end if;
 end;
 $$ delimiter ;
+
+call cadastrarEstoque("2", 50, "Vara de pesca");
+call cadastrarEstoque("3", 100, "Vara de pesca boa");
+call cadastrarEstoque("4", 175, "Vara de pesca muito boa");
 
 delimiter $$ 
 create procedure editarEstoque(unidade varchar(300), quantidade float, produto varchar(300))
@@ -231,6 +248,10 @@ begin
 end;
 $$ delimiter ;
 
+call cadastrarCliente("Kauan Marques", "123.456.789-00", "kauanmarques@gmail.com", "1234567", "2006-08-23");
+call cadastrarCliente("Miguel Henrique", "098.765.432-1", "miguelito@gmail.com", "7654321", "2007-04-20");
+call cadastrarCliente("Gabrieel Guedes", "135.791.357-99", "reds13@gmail.com", "1110202", "2006-07-18");
+
 delimiter $$ 
 create procedure consultarCliente(nome varchar(300))
 begin
@@ -255,6 +276,35 @@ $$ delimiter ;
 
 # == Funcionario ==
 delimiter $$ 
+create procedure cadastroFuncionario(nome_fun varchar(300), cpf_fun varchar(100), email_fun varchar(100), rg_fun varchar(100), data_nasc_fun date, salario_fun float)
+begin
+    if(nome_fun is not null) then
+        if(cpf_fun is not null) then
+            if(email_fun is not null) then
+                if(rg_fun is not null) then
+                    if(data_nasc_fun is not null) then
+                        if(salario_fun is not null) then
+                            insert into funcionario values (null, nome_fun, cpf_fun, email_fun, rg_fun, data_nasc_fun, salario_fun);
+                        else select "Salário inválido" as confirmacao;
+                        end if;
+                    else select "Data de nascimento inválida" as confirmacao;
+                    end if;
+                else select "RG inválido" as confirmacao;
+                end if;
+            else select "Email inválido" as confirmacao;
+            end if;
+        else select "CPF inválido" as confirmacao;
+        end if;
+    else select "Nome inválido" as confirmacao;
+    end if;
+end;
+$$ delimiter ;
+
+call cadastroFuncionario("Adriel", "102.390.192-32", "adriel@gmail.com", "123123", "2001-02-03", 3000);
+call cadastroFuncionario("Kauan", "422.190.195-62", "kauan@gmail.com", "567323", "2000-05-07", 3000);
+call cadastroFuncionario("Guedes", "167.324.167-39", "Guedes@gmail.com", "124423", "2002-03-04", 3000);
+
+delimiter $$ 
 create procedure consultarFuncionario(nome varchar(300))
 begin
 	declare findFuncionario int;
@@ -273,17 +323,6 @@ begin
     end if;
 end;
 $$ delimiter ;
-
-#################
-call cadastrarProduto("Camiseta Spiderverse", 50.00);
-call cadastrarProduto("Moletom Spiderverse", 70.00);
-call cadastrarProduto("Jaqueta Spiderverse", 100.00);
-select * from Produto;
-
-call cadastrarCliente("Kauan Marques", "123.456.789-00", "kauanmarques@gmail.com", "1234567", "2006-08-23");
-call cadastrarCliente("Miguel Henrique", "098.765.432-1", "miguelito@gmail.com", "7654321", "2007-04-20");
-call cadastrarCliente("Gabrieel Guedes", "135.791.357-99", "reds13@gmail.com", "1110202", "2006-07-18");
-select * from Cliente;
 
 # == Usuário ==
 delimiter $$ 
@@ -320,78 +359,63 @@ begin
 end;
 $$ delimiter ;
 
-call cadUsuarios("João Santos", "123.456.789-00", "santsj@gmail.com", "1234567", "2006-08-23");
-call cadUsuarios("Matheus Silva", "098.765.432-1", "matheuss@gmail.com", "7654321", "2007-04-20");
-call cadUsuarios("Gabriel gomes", "135.791.357-99", "rgomes@gmail.com", "1110202", "2006-07-18");
-
+call cadastrarUsuario("João Santos", "123.456.789-00", "santsj@gmail.com", "1234567", "2006-08-23");
+call cadastrarUsuario("Matheus Silva", "098.765.432-1", "matheuss@gmail.com", "7654321", "2007-04-20");
+call cadastrarUsuario("Gabriel gomes", "135.791.357-99", "rgomes@gmail.com", "1110202", "2006-07-18");
 
 # == Venda ==
 
 delimiter $$
-create procedure Venda(valorTotal float, dataVend date, horaVend time, descontoVend int, idProd int)
+create procedure registrarVenda(valorTotal float, dataVend date, horaVend time, descontoVend int, idProd int)
 begin 
-	declare idPro int;
+    declare idPro int;
 
-    select (id_pro) into idPro from produto where idProd = id_pro;
+    select id_pro into idPro from Produto where id_pro = idProd;
     
-    if(idPro is not null) then
-		if(valorTotal is not null) then
-			if(dataVend is not null) then
-				if(horaVend is not null) then
-					if(descontoVend is not null) then 
-						if(descontoVend < 10) then 
-							if(horaVend between '08:00:00' and '18:00:00') then 
-								
-                                
-                                
-								insert into venda values (null, valorTotal, dataVend, horaVend, idProd);
-							else 
-								select "Esse horário não é mais permitido a venda!" as confirmacao;
-							end if;
-						else 
-							select "Esse desconto não é permitido, desconto apenas abaixo de 10%!" as confirmacao;
-						end if;
-					else 
-						select "Esse desconto não é permitido a venda!" as confirmacao;
-					end if;
-				else 
-					select "O horário está inserido de forma incorreta!" as confirmacao;
-				end if;
-			else 
-				select "A data inserida está incorreta!" as confirmacao;
-			end if;
-		else
-			select "O valor está inserido de forma incorreta" as confirmacao;
-		end if;
-	else 
-		select "A chave estrangeira não existe!" as confirmacao;
-	end if;
+    if idPro is not null then
+        if valorTotal is not null and dataVend is not null and horaVend is not null and descontoVend is not null then
+            if descontoVend < 10 and horaVend between '08:00:00' and '18:00:00' then
+                insert into Venda (valor_total_ven, data_ven, hora_ven, desconto_vend, id_pro_fk) values (valorTotal, dataVend, horaVend, descontoVend, idPro);
+                select "Venda registrada com sucesso." as Mensagem;
+            else 
+                select "Desconto ou horário de venda não permitido." as Mensagem;
+            end if;
+        else
+            select "Valores de venda incompletos." as Mensagem;
+        end if;
+    else 
+        select "Produto não encontrado." as Mensagem;
+    end if;
 end;
-$$ delimiter ;
+$$
+delimiter ;
 
-call Venda (200, '2024-11-13', '17:00:00', 8, 1);
+call registrarVenda (200, '2024-11-13', '17:00:02', 8, 1);
+call registrarVenda (400, '2024-11-14', '17:00:04', 5, 1);
+call registrarVenda (600, '2024-11-15', '17:00:06', 9, 1);
 
 # == Forma Pagamento == 
 delimiter $$
 create procedure formaPagamento(formaPag varchar(30), vendaId int)
 begin
+    declare idvend int;
 
-	declare idvend int;
-    
-	select (id_ven) into idvend from venda where idVenda = id_ven;
+    select id_ven into idvend from Venda where id_ven = vendaId;
 
-	if(vendaId is not null) then
-		if (formaPag is not null) then 
-			insert into forma_pagamento values (null, formaPag, vendaId);
-		else
-			select "A forma de pagamento está incorreta!" as confirmacao;
-		end if;
-	else
-		select "A chave estrangeira informada está incorreta!" as confirmacao;
-	end if;
+    if idvend is not null then
+        if formaPag is not null then
+            insert into Forma_Pagamento (forma_fpag, id_ven_fk) values (formaPag, vendaId);
+            select "Forma de pagamento cadastrada com sucesso." as Mensagem;
+        else
+            select "Forma de pagamento inválida." as Mensagem;
+        end if;
+    else
+        select "Venda não encontrada." as Mensagem;
+    end if;
 end;
-$$ delimiter ;
+$$
+delimiter ;
 
 call formaPagamento("Pix", 1);
-
-select * from forma_pagamento;
+call formaPagamento("Crédito", 1);
+call formaPagamento("Débito", 1);
