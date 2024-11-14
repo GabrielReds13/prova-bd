@@ -92,9 +92,9 @@ create table UseVen(
 
 # === Metodos ===
 
-# == Cadastrar Produto ==
+# == Produto ==
 delimiter $$ 
-create procedure cadastroProduto(descricaoProd varchar(300), valorProd float)
+create procedure cadastrarProduto(descricaoProd varchar(300), valorProd float)
 begin
 	if(descricaoProd is not null) then
 		if(valorProd is not null) then
@@ -102,6 +102,7 @@ begin
 				select "O valor do produto não pode ser maior que R$ 1000,00 ou menor que R$ 0,00" as confirmacao;
 			else 
 				insert into Produto values (null, descricaoProd, valorProd);
+                select "Produto cadastrado." as Mensagem;
             end if;
 		else
 			select "Valor produto é inválido" as confimacao;
@@ -112,10 +113,6 @@ begin
 end;
 $$ delimiter ;
 
-call cadastroProduto("", 590);
-
-select * from produto;
-# == ConsultarProduto ==
 delimiter $$ 
 create procedure consultarProduto(produto varchar(300))
 begin
@@ -142,6 +139,93 @@ begin
 end;
 $$ delimiter ;
 
+# == Estoque ==
+delimiter $$ 
+create procedure cadastrarEstoque(unidade varchar(300), quantidade float, produto varchar(300))
+begin
+	declare findProduto int;
+	
+	if(unidade is not null) then
+		if(quantidade is not null) then
+			if(produto is not null) then
+				set findProduto = (select id_pro from Produto where(descricao_pro = produto));
+                
+                if(findProduto) then
+					insert into Estoque values (null, unidade, quantidade, findProduto);
+                    select "Estoque cadastrado." as Mensagem;
+                else 
+					select "Produto não encontrado." as Mensagem;
+                end if;
+            else
+				select "Valor inválido." as Mensagem;
+            end if;
+        else
+			select "Valor inválido." as Mensagem;
+        end if;
+	else 
+		select "Valor inválido." as Mensagem;
+    end if;
+end;
+$$ delimiter ;
+
+delimiter $$ 
+create procedure editarEstoque(unidade varchar(300), quantidade float, produto varchar(300))
+begin
+	declare findProduto int;
+    
+	if(quantidade is not null) then
+		if(produto is not null) then
+			set findProduto = (select id_pro from Produto where(descricao_pro = produto));
+			
+			if(findProduto) then
+				if(unidade is null) then
+					set unidade = (select unidade_est from Estoque where(id_pro_fk = findProd));
+				end if;
+                
+				update Estoque set unidade_est = unidade where(id_pro_fk = findProd);
+				update Estoque set quantidade_est = quantidade where(id_pro_fk = findProd);
+				select "Estoque editado." as Mensagem;
+			else 
+				select "Produto não encontrado." as Mensagem;
+			end if;
+		else
+			select "Valor inválido." as Mensagem;
+		end if;
+	else
+		select "Valor inválido." as Mensagem;
+	end if;
+end;
+$$ delimiter ;
+
+# == Cliente ==
+delimiter $$ 
+create procedure cadastrarCliente(nomeCli varchar(300), cpfCli varchar(30), emailCli varchar(100), rgCli varchar(30), dataNasCli date)
+begin
+	if(nomeCli is not null) then
+		if(cpfCli is not null) then
+			if(emailCli is not null) then
+				if(rgCli is not null) then
+					if(dataNasCli is not null) then
+						insert into Cliente values (null, nomeCli, cpfCli, emailCli, rgCli, dataNasCli);
+                        select "Cliente cadastrado." as Mensagem;
+					else 
+						select "A Data de Nascimento informada é inválida!" as confimacao;
+					end if;
+				else
+					select "O RG informado é inválido!" as confimacao;
+				end if;	
+			else 
+				select "O Email informado é inválido!" as confimacao;
+            end if;
+		else
+			select "O CPF informado é inválido!" as confimacao;
+        end if;	
+	else 
+		select "O Nome informado é inválido!" as confirmacao;
+    end if;
+end;
+$$ delimiter ;
+
 delimiter $$ 
 create procedure consultarCliente(nome varchar(300))
 begin
@@ -164,6 +248,7 @@ begin
 end;
 $$ delimiter ;
 
+# == Funcionario ==
 delimiter $$ 
 create procedure consultarFuncionario(nome varchar(300))
 begin
@@ -184,38 +269,16 @@ begin
 end;
 $$ delimiter ;
 
-# == Cadastrar Cliente ==
-delimiter $$ 
-create procedure cadastroCliente(nomeCli varchar(300), cpfCli varchar(30), emailCli varchar(100), rgCli varchar(30), dataNasCli date)
-begin
-	if(nomeCli is not null) then
-		if(cpfCli is not null) then
-			if(emailCli is not null) then
-				if(rgCli is not null) then
-					if(dataNasCli is not null) then
-						insert into Cliente values (null, nomeCli, cpfCli, emailCli, rgCli, dataNasCli);
-					else 
-						select "A Data de Nascimento informada é inválida!" as confimacao;
-					end if;
-				else
-					select "O RG informado é inválido!" as confimacao;
-				end if;	
-			else 
-				select "O Email informado é inválido!" as confimacao;
-            end if;
-		else
-			select "O CPF informado é inválido!" as confimacao;
-        end if;	
-	else 
-		select "O Nome informado é inválido!" as confirmacao;
-    end if;
-end;
-$$ delimiter ;
 
-call cadastroCliente("Kauan Marques", "123.456.789-00", "kauanmarques@gmail.com", "1234567", "2006-08-23");
-call cadastroCliente("Miguel Henrique", "098.765.432-1", "miguelito@gmail.com", "7654321", "2007-04-20");
-call cadastroCliente("Gabrieel Guedes", "135.791.357-99", "reds13@gmail.com", "1110202", "2006-07-18");
-select * from cliente;
 
-# == 
+#################
+call cadastrarProduto("Camiseta Spiderverse", 50.00);
+call cadastrarProduto("Moletom Spiderverse", 70.00);
+call cadastrarProduto("Jaqueta Spiderverse", 100.00);
+select * from Produto;
+
+call cadastrarCliente("Kauan Marques", "123.456.789-00", "kauanmarques@gmail.com", "1234567", "2006-08-23");
+call cadastrarCliente("Miguel Henrique", "098.765.432-1", "miguelito@gmail.com", "7654321", "2007-04-20");
+call cadastrarCliente("Gabrieel Guedes", "135.791.357-99", "reds13@gmail.com", "1110202", "2006-07-18");
+select * from Cliente;
 
