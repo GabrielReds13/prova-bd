@@ -92,9 +92,9 @@ create table UseVen(
 
 # === Metodos ===
 
-# == Cadastrar Produto ==
+# == Produto ==
 delimiter $$ 
-create procedure cadastroProduto(descricaoProd varchar(300), valorProd float)
+create procedure cadastrarProduto(descricaoProd varchar(300), valorProd float)
 begin
 	if(descricaoProd is not null) then
 		if(valorProd is not null) then
@@ -102,6 +102,7 @@ begin
 				select "O valor do produto não pode ser maior que R$ 1000,00 ou menor que R$ 0,00" as confirmacao;
 			else 
 				insert into Produto values (null, descricaoProd, valorProd);
+                select "Produto cadastrado." as Mensagem;
             end if;
 		else
 			select "Valor produto é inválido" as confimacao;
@@ -112,10 +113,6 @@ begin
 end;
 $$ delimiter ;
 
-call cadastroProduto("", 590);
-
-select * from produto;
-# == ConsultarProduto ==
 delimiter $$ 
 create procedure consultarProduto(produto varchar(300))
 begin
@@ -142,51 +139,67 @@ begin
 end;
 $$ delimiter ;
 
+# == Estoque ==
 delimiter $$ 
-create procedure consultarCliente(nome varchar(300))
+create procedure cadastrarEstoque(unidade varchar(300), quantidade float, produto varchar(300))
 begin
-	declare findCliente int;
-    set findCliente = (select id_cli from cliente where (nome_cli = nome));
-    
-    if(nome is not null) then
-		set findCliente = (select id_cli from cliente where (nome_cli = nome));
-    
-		if(findCliente) then
-			select
-			nome_cli as Nome
-			from Cliente;
-		else
-			select "Cliente não encontrado" as Mensagem; 
-		end if;
-    else
-		select "Texto inválido." as Mensagem; 
+	declare findProduto int;
+	
+	if(unidade is not null) then
+		if(quantidade is not null) then
+			if(produto is not null) then
+				set findProduto = (select id_pro from Produto where(descricao_pro = produto));
+                
+                if(findProduto) then
+					insert into Estoque values (null, unidade, quantidade, findProduto);
+                    select "Estoque cadastrado." as Mensagem;
+                else 
+					select "Produto não encontrado." as Mensagem;
+                end if;
+            else
+				select "Valor inválido." as Mensagem;
+            end if;
+        else
+			select "Valor inválido." as Mensagem;
+        end if;
+	else 
+		select "Valor inválido." as Mensagem;
     end if;
 end;
 $$ delimiter ;
 
 delimiter $$ 
-create procedure consultarFuncionario(nome varchar(300))
+create procedure editarEstoque(unidade varchar(300), quantidade float, produto varchar(300))
 begin
-	declare findFuncionario int;
-	if(nome is not null) then
-		set findFuncionario = (select id_fun from Funcionario where (nome_fun = nome));
+	declare findProduto int;
     
-		if(findFuncionario) then
-			select
-			nome_fun as Nome
-			from Funcionario;
+	if(quantidade is not null) then
+		if(produto is not null) then
+			set findProduto = (select id_pro from Produto where(descricao_pro = produto));
+			
+			if(findProduto) then
+				if(unidade is null) then
+					set unidade = (select unidade_est from Estoque where(id_pro_fk = findProd));
+				end if;
+                
+				update Estoque set unidade_est = unidade where(id_pro_fk = findProd);
+				update Estoque set quantidade_est = quantidade where(id_pro_fk = findProd);
+				select "Estoque editado." as Mensagem;
+			else 
+				select "Produto não encontrado." as Mensagem;
+			end if;
 		else
-			select "Funcionário não encontrado" as Mensagem; 
+			select "Valor inválido." as Mensagem;
 		end if;
-    else
-		select "Texto inválido." as Mensagem; 
-    end if;
+	else
+		select "Valor inválido." as Mensagem;
+	end if;
 end;
 $$ delimiter ;
 
-# == Cadastrar Cliente ==
+# == Cliente ==
 delimiter $$ 
-create procedure cadastrosCliente(nomeCli varchar(300), cpfCli varchar(30), emailCli varchar(100), rgCli varchar(30), dataNasCli date)
+create procedure cadastrarCliente(nomeCli varchar(300), cpfCli varchar(30), emailCli varchar(100), rgCli varchar(30), dataNasCli date)
 begin
 	declare name varchar(100);
 	select nome_cli into name from cliente;
@@ -218,13 +231,63 @@ begin
 end;
 $$ delimiter ;
 
-call cadastrosCliente("Kauan Marques", "123.456.789-00", "kauanmarques@gmail.com", "1234567", "2006-08-23");
-call cadastrosCliente("Miguel Henrique", "098.765.432-1", "miguelito@gmail.com", "7654321", "2007-04-20");
-call cadastrosCliente("Gabrieel Guedes", "135.791.357-99", "reds13@gmail.com", "1110202", "2006-07-18");
-
-# == Cadastrar Usuário ==
 delimiter $$ 
-create procedure cadUsuarios(nomeUsu varchar(300), cpfUsu varchar(30), emailUsu varchar(100), rgUsu varchar(30), dataNasUsu date)
+create procedure consultarCliente(nome varchar(300))
+begin
+	declare findCliente int;
+    set findCliente = (select id_cli from cliente where (nome_cli = nome));
+    
+    if(nome is not null) then
+		set findCliente = (select id_cli from cliente where (nome_cli = nome));
+    
+		if(findCliente) then
+			select
+			nome_cli as Nome
+			from Cliente;
+		else
+			select "Cliente não encontrado" as Mensagem; 
+		end if;
+    else
+		select "Texto inválido." as Mensagem; 
+    end if;
+end;
+$$ delimiter ;
+
+# == Funcionario ==
+delimiter $$ 
+create procedure consultarFuncionario(nome varchar(300))
+begin
+	declare findFuncionario int;
+	if(nome is not null) then
+		set findFuncionario = (select id_fun from Funcionario where (nome_fun = nome));
+    
+		if(findFuncionario) then
+			select
+			nome_fun as Nome
+			from Funcionario;
+		else
+			select "Funcionário não encontrado" as Mensagem; 
+		end if;
+    else
+		select "Texto inválido." as Mensagem; 
+    end if;
+end;
+$$ delimiter ;
+
+#################
+call cadastrarProduto("Camiseta Spiderverse", 50.00);
+call cadastrarProduto("Moletom Spiderverse", 70.00);
+call cadastrarProduto("Jaqueta Spiderverse", 100.00);
+select * from Produto;
+
+call cadastrarCliente("Kauan Marques", "123.456.789-00", "kauanmarques@gmail.com", "1234567", "2006-08-23");
+call cadastrarCliente("Miguel Henrique", "098.765.432-1", "miguelito@gmail.com", "7654321", "2007-04-20");
+call cadastrarCliente("Gabrieel Guedes", "135.791.357-99", "reds13@gmail.com", "1110202", "2006-07-18");
+select * from Cliente;
+
+# == Usuário ==
+delimiter $$ 
+create procedure cadastrarUsuario(nomeUsu varchar(300), cpfUsu varchar(30), emailUsu varchar(100), rgUsu varchar(30), dataNasUsu date)
 begin
 	declare nameUsu varchar(100);
 	select count(*) into nameUsu from Usuario where nomeUsu = nome_usu;
@@ -310,16 +373,16 @@ call Venda (200, '2024-11-13', '17:00:00', 8, 1);
 
 # == Forma Pagamento == 
 delimiter $$
-create procedure formPagament(formaPag varchar(30), idVenda int)
+create procedure formaPagamento(formaPag varchar(30), vendaId int)
 begin
 
 	declare idvend int;
     
 	select (id_ven) into idvend from venda where idVenda = id_ven;
 
-	if(idVenda is not null) then
+	if(vendaId is not null) then
 		if (formaPag is not null) then 
-			insert into forma_pagamento values (null, formaPag, idVenda);
+			insert into forma_pagamento values (null, formaPag, vendaId);
 		else
 			select "A forma de pagamento está incorreta!" as confirmacao;
 		end if;
@@ -329,7 +392,6 @@ begin
 end;
 $$ delimiter ;
 
-call formPagament("Pix", 3);
+call formaPagamento("Pix", 1);
 
 select * from forma_pagamento;
-
