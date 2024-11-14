@@ -260,12 +260,33 @@ $$ delimiter ;
 call cadUsuarios("João Santos", "123.456.789-00", "santsj@gmail.com", "1234567", "2006-08-23");
 call cadastroUsuario("Matheus Silva", "098.765.432-1", "matheuss@gmail.com", "7654321", "2007-04-20");
 call cadastroUsuario("Gabriel gomes", "135.791.357-99", "rgomes@gmail.com", "1110202", "2006-07-18");
+select * from venda;
 
-select * from Usuario;
 
-# == Venda == 
-#delimiter $$
-#create procedure Venda(
 
-#$$ delimiter ;
+insert into venda values (null, 200, '2024-11-12', '12:00:00', 1);
+# == Forma Pagamento == 
+delimiter $$
+create procedure formPagament(formaPag varchar(30), idVenda int)
+begin
+
+	declare idvend int;
+    
+	select (venda.id_ven) into idvend from venda where idVenda = id_ven;
+
+	if(idVenda is not null) then
+		if (formaPag is not null) then 
+			insert into forma_pagamento values (null, formaPag, idVenda);
+		else
+			select "A forma de pagamento está incorreta!" as confirmacao;
+		end if;
+	else
+		select "A chave estrangeira informada está incorreta!" as confirmacao;
+	end if;
+end;
+$$ delimiter ;
+
+call formPagament("Pix", 3);
+
+select * from forma_pagamento;
 
