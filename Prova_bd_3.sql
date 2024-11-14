@@ -42,7 +42,7 @@ create table Venda(
     valor_total_ven float not null,
     data_ven date not null,
     hora_ven time not null,
-    
+    desconto_vend int not null,
     id_pro_fk int,
     foreign key(id_pro_fk) references Produto(id_pro)
 );
@@ -258,13 +258,56 @@ end;
 $$ delimiter ;
 
 call cadUsuarios("João Santos", "123.456.789-00", "santsj@gmail.com", "1234567", "2006-08-23");
-call cadastroUsuario("Matheus Silva", "098.765.432-1", "matheuss@gmail.com", "7654321", "2007-04-20");
-call cadastroUsuario("Gabriel gomes", "135.791.357-99", "rgomes@gmail.com", "1110202", "2006-07-18");
-select * from venda;
+call cadUsuarios("Matheus Silva", "098.765.432-1", "matheuss@gmail.com", "7654321", "2007-04-20");
+call cadUsuarios("Gabriel gomes", "135.791.357-99", "rgomes@gmail.com", "1110202", "2006-07-18");
 
 
+# == Venda ==
 
-insert into venda values (null, 200, '2024-11-12', '12:00:00', 1);
+delimiter $$
+create procedure Venda(valorTotal float, dataVend date, horaVend time, descontoVend int, idProd int)
+begin 
+	declare idPro int;
+
+    select (id_pro) into idPro from produto where idProd = id_pro;
+    
+    if(idPro is not null) then
+		if(valorTotal is not null) then
+			if(dataVend is not null) then
+				if(horaVend is not null) then
+					if(descontoVend is not null) then 
+						if(descontoVend < 10) then 
+							if(horaVend between '08:00:00' and '18:00:00') then 
+								
+                                
+                                
+								insert into venda values (null, valorTotal, dataVend, horaVend, idProd);
+							else 
+								select "Esse horário não é mais permitido a venda!" as confirmacao;
+							end if;
+						else 
+							select "Esse desconto não é permitido, desconto apenas abaixo de 10%!" as confirmacao;
+						end if;
+					else 
+						select "Esse desconto não é permitido a venda!" as confirmacao;
+					end if;
+				else 
+					select "O horário está inserido de forma incorreta!" as confirmacao;
+				end if;
+			else 
+				select "A data inserida está incorreta!" as confirmacao;
+			end if;
+		else
+			select "O valor está inserido de forma incorreta" as confirmacao;
+		end if;
+	else 
+		select "A chave estrangeira não existe!" as confirmacao;
+	end if;
+end;
+$$ delimiter ;
+
+call Venda (200, '2024-11-13', '17:00:00', 8, 1);
+
 # == Forma Pagamento == 
 delimiter $$
 create procedure formPagament(formaPag varchar(30), idVenda int)
@@ -272,7 +315,7 @@ begin
 
 	declare idvend int;
     
-	select (venda.id_ven) into idvend from venda where idVenda = id_ven;
+	select (id_ven) into idvend from venda where idVenda = id_ven;
 
 	if(idVenda is not null) then
 		if (formaPag is not null) then 
