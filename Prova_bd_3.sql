@@ -269,6 +269,7 @@ begin
 end;
 $$ delimiter ;
 
+<<<<<<< HEAD
 
 
 #################
@@ -281,4 +282,90 @@ call cadastrarCliente("Kauan Marques", "123.456.789-00", "kauanmarques@gmail.com
 call cadastrarCliente("Miguel Henrique", "098.765.432-1", "miguelito@gmail.com", "7654321", "2007-04-20");
 call cadastrarCliente("Gabrieel Guedes", "135.791.357-99", "reds13@gmail.com", "1110202", "2006-07-18");
 select * from Cliente;
+=======
+# == Cadastrar Cliente ==
+delimiter $$ 
+create procedure cadastrosCliente(nomeCli varchar(300), cpfCli varchar(30), emailCli varchar(100), rgCli varchar(30), dataNasCli date)
+begin
+	declare name varchar(100);
+	select nome_cli into name from cliente;
+	if (name<> nomeCli) then
+		if(nomeCli is not null) then
+			if(cpfCli is not null) then
+				if(emailCli is not null) then
+					if(rgCli is not null) then
+						if(dataNasCli is not null) then
+							insert into Cliente values (null, nomeCli, cpfCli, emailCli, rgCli, dataNasCli);
+						else 
+							select "A Data de Nascimento informada é inválida!" as confimacao;
+						end if;
+					else
+						select "O RG informado é inválido!" as confimacao;
+					end if;	
+				else 
+					select "O Email informado é inválido!" as confimacao;
+				end if;
+			else
+				select "O CPF informado é inválido!" as confimacao;
+			end if;	
+		else 
+			select "O Nome informado é inválido!" as confirmacao;
+		end if;
+	else 
+		select "O Nome informado já existe!" as confirmacao;
+	end if;
+end;
+$$ delimiter ;
+
+call cadastrosCliente("Kauan Marques", "123.456.789-00", "kauanmarques@gmail.com", "1234567", "2006-08-23");
+call cadastrosCliente("Miguel Henrique", "098.765.432-1", "miguelito@gmail.com", "7654321", "2007-04-20");
+call cadastrosCliente("Gabrieel Guedes", "135.791.357-99", "reds13@gmail.com", "1110202", "2006-07-18");
+
+# == Cadastrar Usuário ==
+delimiter $$ 
+create procedure cadUsuarios(nomeUsu varchar(300), cpfUsu varchar(30), emailUsu varchar(100), rgUsu varchar(30), dataNasUsu date)
+begin
+	declare nameUsu varchar(100);
+	select count(*) into nameUsu from Usuario where nomeUsu = nome_usu;
+	if (nameUsu > 0) then
+		select "O Nome informado já existe!" as confirmacao;
+    else 
+		if(nomeUsu is not null) then
+			if(cpfUsu is not null) then
+				if(emailUsu is not null) then
+					if(rgUsu is not null) then
+						if(dataNasUsu is not null) then
+							insert into Usuario values (null, nomeUsu, cpfUsu, emailUsu, rgUsu, dataNasUsu);
+						else 
+							select "A Data de Nascimento informada é inválida!" as confimacao;
+						end if;
+					else
+						select "O RG informado é inválido!" as confimacao;
+					end if;	
+				else 
+					select "O Email informado é inválido!" as confimacao;
+				end if;
+			else
+				select "O CPF informado é inválido!" as confimacao;
+			end if;	
+		else 
+			select "O Nome informado é inválido!" as confirmacao;
+		end if;
+	end if;
+		
+end;
+$$ delimiter ;
+
+call cadUsuarios("João Santos", "123.456.789-00", "santsj@gmail.com", "1234567", "2006-08-23");
+call cadastroUsuario("Matheus Silva", "098.765.432-1", "matheuss@gmail.com", "7654321", "2007-04-20");
+call cadastroUsuario("Gabriel gomes", "135.791.357-99", "rgomes@gmail.com", "1110202", "2006-07-18");
+
+select * from Usuario;
+
+# == Venda == 
+#delimiter $$
+#create procedure Venda(
+
+#$$ delimiter ;
+>>>>>>> origin/master
 
