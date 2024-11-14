@@ -287,7 +287,7 @@ select * from Cliente;
 
 # == Usuário ==
 delimiter $$ 
-create procedure cadUsuarios(nomeUsu varchar(300), cpfUsu varchar(30), emailUsu varchar(100), rgUsu varchar(30), dataNasUsu date)
+create procedure cadastrarUsuario(nomeUsu varchar(300), cpfUsu varchar(30), emailUsu varchar(100), rgUsu varchar(30), dataNasUsu date)
 begin
 	declare nameUsu varchar(100);
 	select count(*) into nameUsu from Usuario where nomeUsu = nome_usu;
@@ -320,24 +320,24 @@ begin
 end;
 $$ delimiter ;
 
-call cadUsuarios("João Santos", "123.456.789-00", "santsj@gmail.com", "1234567", "2006-08-23");
-call cadastroUsuario("Matheus Silva", "098.765.432-1", "matheuss@gmail.com", "7654321", "2007-04-20");
-call cadastroUsuario("Gabriel gomes", "135.791.357-99", "rgomes@gmail.com", "1110202", "2006-07-18");
+call cadastrarUsuario("João Santos", "123.456.789-00", "santsj@gmail.com", "1234567", "2006-08-23");
+call cadastrarUsuario("Matheus Silva", "098.765.432-1", "matheuss@gmail.com", "7654321", "2007-04-20");
+call cadastrarUsuario("Gabriel gomes", "135.791.357-99", "rgomes@gmail.com", "1110202", "2006-07-18");
 select * from venda;
 
 insert into venda values (null, 200, '2024-11-12', '12:00:00', 1);
 # == Forma Pagamento == 
 delimiter $$
-create procedure formPagament(formaPag varchar(30), idVenda int)
+create procedure formaPagamento(formaPag varchar(30), vendaId int)
 begin
 
 	declare idvend int;
     
-	select (venda.id_ven) into idvend from venda where idVenda = id_ven;
+	select (venda.id_ven) into idvend from venda where vendaId = id_ven;
 
-	if(idVenda is not null) then
+	if(vendaId is not null) then
 		if (formaPag is not null) then 
-			insert into forma_pagamento values (null, formaPag, idVenda);
+			insert into forma_pagamento values (null, formaPag, vendaId);
 		else
 			select "A forma de pagamento está incorreta!" as confirmacao;
 		end if;
@@ -347,6 +347,6 @@ begin
 end;
 $$ delimiter ;
 
-call formPagament("Pix", 3);
+call formaPagamento("Pix", 1);
 
 select * from forma_pagamento;
